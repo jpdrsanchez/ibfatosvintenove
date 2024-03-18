@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  ibfatosvintenove_wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ibfatosvintenove_wordpress
+    restart: always
+    volumes:
+      - ./src/:/var/www/ibfatosvintenove
+    depends_on:
+      - ibfatosvintenove_db
+    networks:
+      - atosvintenove_network
+    ports:
+      - "80:80"
+      - "443:443"
+
+  ibfatosvintenove_db:
+    image: mariadb
+    restart: always
+    container_name: ibfatosvintenove_db
+    environment:
+      - MARIADB_DATABASE=${DB_NAME}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+      - MARIADB_RANDOM_ROOT_PASSWORD=true
+    networks:
+      - atosvintenove_network
+    volumes:
+      - data:/var/lib/mysql
+
+  ibfatosvintenove_adminer:
+    image: adminer
+    restart: always
+    container_name: ibfatosvintenove_adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - ibfatosvintenove_db
+    networks:
+      - atosvintenove_network
+
+networks:
+  atosvintenove_network:
+    driver: bridge
+
+volumes:
+  data:
